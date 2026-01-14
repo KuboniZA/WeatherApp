@@ -15,7 +15,7 @@ app = Flask(__name__)
 
 @app.route("/weather")
 def get_weather(city:str):
-    city = requests.args.get("city")
+    city = requests.args.get()
     if not city:
         return jsonify({"error": "Please provide a city parameter, e.g., /weather?city=London"}), 400
     try:

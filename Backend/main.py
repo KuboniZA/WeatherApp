@@ -1,4 +1,5 @@
 from flask import Flask, jsonify, request
+from flask_cors import CORS
 import requests
 from dotenv import load_dotenv
 import os
@@ -11,6 +12,14 @@ if not API_KEY:
     raise ValueError("WEATHER_API_KEY is not set in .env")
 
 app = Flask(__name__)
+CORS(app, resources={
+    r"/weather": {
+        "origins": [
+            "http://localhost:5173",
+            "http://127.0.0.1:5173"
+        ]
+    }
+})
 
 @app.route("/weather")
 def get_weather():
@@ -37,8 +46,8 @@ def get_weather():
         #         "error": data.get("message", "City not found.")
         #     }), response.status_code
         
-        print(data)
-        return jsonify(data)
+        #print(data)
+        return jsonify(data), 200
     except requests.exceptions.HTTPError as e:
         return jsonify({"error": "City not found."}), response.status_code
     except requests.exceptions.RequestException as e:

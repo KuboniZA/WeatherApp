@@ -20,7 +20,7 @@ const getWeather = async () => {
   try {
     error.value = '';
     const res = await axios.get<weatherResponse>(
-      `http://127.0.0.1:8000/weather?city=${encodeURIComponent(city.value)}`
+      `http://127.0.0.1:5000/weather?city=${encodeURIComponent(city.value)}`
     );
     weather.value =res.data;
   } catch {

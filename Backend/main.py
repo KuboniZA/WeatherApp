@@ -1,12 +1,12 @@
 from flask import Flask, jsonify, request
-# import requests
+import requests
 from dotenv import load_dotenv
 import os
 
 load_dotenv()
 API_KEY = os.getenv("WEATHER_API_KEY")
 
-BASE_URL = "https://api.openweathermap.org/data/2.5/weather?lat={lat}&lon={lon}&appid={API key}"
+BASE_URL = "https://api.openweathermap.org/data/2.5/weather"
 if not API_KEY:
     raise ValueError("WEATHER_API_KEY is not set in .env")
 
@@ -19,7 +19,7 @@ def get_weather():
     city = request.args.get("city")
     
     if not city:
-        return jsonify({"error": "Please provide a city parameter, e.g., /weather?city=London"}), 400
+        return jsonify({"error": "Please provide a city parameter"}), 400
     
     try:
         params = {
@@ -28,17 +28,21 @@ def get_weather():
             "units": "metric"
         }
 
-        response = request.get(BASE_URL, params=params, timeout=8)
+        response = requests.get(BASE_URL, params=params, timeout=8)
+        response.raise_for_status()
         data = response.json()
 
-        if response.status_code !=200:
-            return jsonify({
-                "error": data.get("message", "City not found.")
-            }), response.status_code
+        # if response.status_code !=200:
+        #     return jsonify({
+        #         "error": data.get("message", "City not found.")
+        #     }), response.status_code
         
+        print(data)
         return jsonify(data)
-    except request.exceptions.RequestException:
-        return jsonify({"error": "Failed to connect to weather service"}), 503
+    except requests.exceptions.HTTPError as e:
+        return jsonify({"error": "City not found."}), response.status_code
+    except requests.exceptions.RequestException as e:
+        return jsonify({"error": str(e)}), 500
 
 if __name__ == "__main__":
     app.run(debug=True)

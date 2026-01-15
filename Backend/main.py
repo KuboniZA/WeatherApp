@@ -3,21 +3,22 @@ import requests
 from dotenv import load_dotenv
 import os
 
-load_dotenv()
-
-API_KEY = os.getenv("WEATHER_API_KEY")
-BASE_URL = "https://api.openweathermap.org/data/2.5/weather"
-
-if not API_KEY:
-    raise ValueError("WEATHER_API_KEY is not set in .env")
 
 app = Flask(__name__)
 
 @app.route("/weather")
 def get_weather(city:str):
+    # return jsonify(message="Hello from the backend!")
+
+    load_dotenv()
+    API_KEY = os.getenv("WEATHER_API_KEY")
     city = requests.args.get()
+    BASE_URL = "https://api.openweathermap.org/data/2.5/weather?lat={lat}&lon={lon}&appid={API key}"
+    if not API_KEY:
+        raise ValueError("WEATHER_API_KEY is not set in .env")
     if not city:
         return jsonify({"error": "Please provide a city parameter, e.g., /weather?city=London"}), 400
+    
     try:
         params = {
             "q": city,
